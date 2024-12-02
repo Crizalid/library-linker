@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Books from "./pages/Books";
 import Members from "./pages/Members";
 import Search from "./pages/Search";
+import AdminRoute from "./components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -21,8 +22,12 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/books" element={<Books />} />
-            <Route path="/members" element={<Members />} />
             <Route path="/search" element={<Search />} />
+            
+            {/* Route protégée pour les administrateurs */}
+            <Route element={<AdminRoute />}>
+              <Route path="/members" element={<Members />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

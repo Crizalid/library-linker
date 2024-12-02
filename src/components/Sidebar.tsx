@@ -1,14 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 import { BookOpen, Users, LayoutDashboard, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const Sidebar = () => {
   const location = useLocation();
+  const { isAdmin } = useAdmin();
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/" },
     { icon: BookOpen, label: "Books", path: "/books" },
-    { icon: Users, label: "Members", path: "/members" },
+    ...(isAdmin ? [{ icon: Users, label: "Members", path: "/members" }] : []),
     { icon: Search, label: "Search", path: "/search" },
   ];
 
