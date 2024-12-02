@@ -1,9 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, MoreVertical } from "lucide-react";
+import { Search, BookOpen, Plus, MoreVertical } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Members = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+
   const members = [
     {
       name: "John Doe",
@@ -25,37 +30,74 @@ const Members = () => {
     },
   ];
 
+  const handleBorrowRequest = (memberName: string) => {
+    toast({
+      title: "Demande d'emprunt",
+      description: `Demande d'emprunt initiée pour ${memberName}`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Members</h1>
-          <p className="text-gray-600 mt-1">Manage library members</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Membres</h1>
+          <p className="text-gray-600 mt-1">Gérer les membres de la bibliothèque</p>
         </div>
         <Button className="bg-primary-600 hover:bg-primary-700">
           <Plus className="h-4 w-4 mr-2" />
-          Add Member
+          Ajouter un membre
         </Button>
       </div>
 
-      <Card className="p-6">
-        <div className="flex gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input className="pl-10" placeholder="Search members..." />
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="p-6">
+          <div className="flex gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input 
+                className="pl-10" 
+                placeholder="Rechercher des livres..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button variant="outline">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Catalogue
+            </Button>
           </div>
-          <Button variant="outline">Filters</Button>
-        </div>
+        </Card>
 
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold mb-4">Emprunts rapides</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Livres disponibles</span>
+              <span className="font-medium">42</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Emprunts en cours</span>
+              <span className="font-medium">12</span>
+            </div>
+            <Button className="w-full" onClick={() => handleBorrowRequest("Nouveau membre")}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvelle demande d'emprunt
+            </Button>
+          </div>
+        </Card>
+      </div>
+
+      <Card className="p-6">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Name</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Nom</th>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Email</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Membership ID</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600"></th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">ID Membre</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Statut</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -80,9 +122,19 @@ const Members = () => {
                     </span>
                   </td>
                   <td className="py-3 px-4">
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleBorrowRequest(member.name)}
+                      >
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        Emprunter
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
