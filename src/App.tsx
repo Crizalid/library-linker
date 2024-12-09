@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Books from "./pages/Books";
-import Members from "./pages/Members";
 import Search from "./pages/Search";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
@@ -27,11 +26,6 @@ const App = () => (
             <Route path="/books" element={<Books />} />
             <Route path="/search" element={<Search />} />
             <Route path="/profile" element={<Profile />} />
-            
-            {/* Route protégée pour les administrateurs */}
-            <Route element={<AdminRoute />}>
-              <Route path="/members" element={<Members />} />
-            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

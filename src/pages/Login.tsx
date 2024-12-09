@@ -16,16 +16,14 @@ import {
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("student"); // "student" or "admin"
+  const [userType, setUserType] = useState("student");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simulation de validation (à remplacer par une vraie authentification)
     if (email && password) {
-      // Store login info
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userEmail", email);
       localStorage.setItem("userType", userType);
@@ -35,12 +33,7 @@ const Login = () => {
         description: "Bienvenue sur votre espace personnel",
       });
 
-      // Redirect based on user type
-      if (userType === "admin") {
-        navigate("/members");
-      } else {
-        navigate("/books");
-      }
+      navigate("/books");
     } else {
       toast({
         title: "Erreur de connexion",
