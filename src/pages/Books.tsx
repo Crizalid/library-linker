@@ -53,24 +53,56 @@ const Books = () => {
   ];
 
   const handleBorrowRequest = (bookTitle: string) => {
-    // Simuler l'envoi d'une notification à l'admin
     const userType = localStorage.getItem("userType");
     const username = localStorage.getItem("username") || "Utilisateur";
 
     if (userType === "student") {
+      // Enregistrer la date d'emprunt
+      const borrowDate = new Date();
+      const returnDate = new Date(borrowDate);
+      returnDate.setDate(returnDate.getDate() + 15); // Ajouter 15 jours
+
+      // Enregistrer les informations d'emprunt dans le localStorage
+      const borrowedBooks = JSON.parse(localStorage.getItem("borrowedBooks") || "[]");
+      borrowedBooks.push({
+        title: bookTitle,
+        borrowDate: borrowDate.toISOString(),
+        returnDate: returnDate.toISOString(),
+        reminded: false,
+      });
+      localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
+
+      // Notification immédiate pour l'emprunt
       toast({
         title: "Demande envoyée",
-        description: `Votre demande pour "${bookTitle}" a été envoyée à l'administrateur.`,
+        description: `Votre demande pour "${bookTitle}" a été envoyée à l'administrateur. Date de retour prévue : ${returnDate.toLocaleDateString()}`,
         duration: 5000,
       });
 
-      // Notification pour l'admin (simulée ici)
+      // Notification pour l'admin
       if (localStorage.getItem("userType") === "admin") {
         toast({
           title: "Nouvelle demande d'emprunt",
           description: `${username} souhaite emprunter "${bookTitle}"`,
           duration: 5000,
         });
+      }
+
+      // Configurer le rappel 24h avant la date de retour
+      const reminderDate = new Date(returnDate);
+      reminderDate.setDate(reminderDate.getDate() - 1);
+      
+      const now = new Date();
+      const timeUntilReminder = reminderDate.getTime() - now.getTime();
+
+      if (timeUntilReminder > 0) {
+        setTimeout(() => {
+          toast({
+            title: "Rappel de retour",
+            description: `Le livre "${bookTitle}" doit être retourné demain. Date limite : ${returnDate.toLocaleDateString()}`,
+            duration: 10000,
+          });
+        }, timeUntilReminder);
       }
     }
   };
