@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -15,6 +16,7 @@ import {
 
 const Books = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -50,6 +52,29 @@ const Books = () => {
     },
   ];
 
+  const handleBorrowRequest = (bookTitle: string) => {
+    // Simuler l'envoi d'une notification à l'admin
+    const userType = localStorage.getItem("userType");
+    const username = localStorage.getItem("username") || "Utilisateur";
+
+    if (userType === "student") {
+      toast({
+        title: "Demande envoyée",
+        description: `Votre demande pour "${bookTitle}" a été envoyée à l'administrateur.`,
+        duration: 5000,
+      });
+
+      // Notification pour l'admin (simulée ici)
+      if (localStorage.getItem("userType") === "admin") {
+        toast({
+          title: "Nouvelle demande d'emprunt",
+          description: `${username} souhaite emprunter "${bookTitle}"`,
+          duration: 5000,
+        });
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -78,6 +103,7 @@ const Books = () => {
                 <TableHead>Année</TableHead>
                 <TableHead>ISBN</TableHead>
                 <TableHead>Statut</TableHead>
+                <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -98,6 +124,17 @@ const Books = () => {
                     >
                       {book.status === "Available" ? "Disponible" : "Emprunté"}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleBorrowRequest(book.title)}
+                      disabled={book.status !== "Available"}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Emprunter
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
