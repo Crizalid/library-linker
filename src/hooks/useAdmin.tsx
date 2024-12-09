@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useAdmin = () => {
-  // Pour la démonstration, on utilise un état local
-  // Dans une vraie application, ceci viendrait d'un système d'authentification
-  const [isAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const userType = localStorage.getItem("userType");
+    setIsAdmin(userType === "admin");
+  }, []);
   
   return {
     isAdmin,
