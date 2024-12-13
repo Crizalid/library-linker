@@ -12,6 +12,7 @@ import {
   Line,
 } from "recharts";
 import { useAdmin } from "@/hooks/useAdmin";
+import CsvImport from "@/components/CsvImport";
 
 const StatCard = ({ icon: Icon, label, value, trend }: any) => (
   <Card className="p-6 animate-fade-in">
@@ -59,7 +60,6 @@ const Dashboard = () => {
     },
   ];
 
-  // Données simulées pour les graphiques
   const monthlyBorrowData = [
     { month: "Jan", emprunts: 65 },
     { month: "Fév", emprunts: 45 },
@@ -91,81 +91,87 @@ const Dashboard = () => {
       </div>
 
       {isAdmin && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Emprunts mensuels</h2>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyBorrowData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="emprunts" 
-                    stroke="#2563eb" 
-                    strokeWidth={2}
-                    name="Nombre d'emprunts"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+        <>
+          <Card className="p-4">
+            <CsvImport />
           </Card>
 
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Emprunts par catégorie</h2>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={categoryData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="category" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar 
-                    dataKey="emprunts" 
-                    fill="#2563eb" 
-                    name="Nombre d'emprunts"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Emprunts mensuels</h2>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={monthlyBorrowData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line 
+                      type="monotone" 
+                      dataKey="emprunts" 
+                      stroke="#2563eb" 
+                      strokeWidth={2}
+                      name="Nombre d'emprunts"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
 
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Activités récentes</h2>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                  <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
-                    <BookOpen className="h-5 w-5 text-primary-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Livre emprunté</p>
-                    <p className="text-sm text-gray-600">John Doe a emprunté "Le Grand Gatsby"</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Emprunts par catégorie</h2>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={categoryData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="category" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar 
+                      dataKey="emprunts" 
+                      fill="#2563eb" 
+                      name="Nombre d'emprunts"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
 
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Livres les plus empruntés</h2>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                  <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
-                    <BookOpen className="h-5 w-5 text-primary-600" />
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Activités récentes</h2>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                      <BookOpen className="h-5 w-5 text-primary-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Livre emprunté</p>
+                      <p className="text-sm text-gray-600">John Doe a emprunté "Le Grand Gatsby"</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Le Grand Gatsby</p>
-                    <p className="text-sm text-gray-600">Emprunté 24 fois ce mois</p>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Livres les plus empruntés</h2>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                      <BookOpen className="h-5 w-5 text-primary-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Le Grand Gatsby</p>
+                      <p className="text-sm text-gray-600">Emprunté 24 fois ce mois</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </>
       )}
     </div>
   );
