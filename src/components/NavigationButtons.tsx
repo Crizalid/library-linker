@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 import { BookOpen, LayoutDashboard, Search, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAdmin } from "@/hooks/useAdmin";
+import { Button } from "@/components/ui/button";
 
-const Sidebar = () => {
+const NavigationButtons = () => {
   const location = useLocation();
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
@@ -15,24 +15,23 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 min-h-screen p-4">
-      <nav className="space-y-2">
-        {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
+    <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+      {menuItems.map((item) => (
+        <Link key={item.path} to={item.path}>
+          <Button
+            variant={location.pathname === item.path ? "default" : "outline"}
             className={cn(
-              "flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-white/50 transition-all duration-200",
-              location.pathname === item.path && "bg-white/70 text-primary shadow-sm"
+              "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200",
+              location.pathname === item.path && "shadow-oneui-colored"
             )}
           >
             <item.icon className="w-5 h-5" />
             <span className="font-medium">{item.label}</span>
-          </Link>
-        ))}
-      </nav>
-    </aside>
+          </Button>
+        </Link>
+      ))}
+    </div>
   );
 };
 
-export default Sidebar;
+export default NavigationButtons;
