@@ -6,12 +6,14 @@ import { useToast } from "@/components/ui/use-toast";
 
 const Profile = () => {
   const [userEmail, setUserEmail] = useState("");
+  const [userRole, setUserRole] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const email = localStorage.getItem("userEmail");
+    const userType = localStorage.getItem("userType");
 
     if (!isLoggedIn) {
       navigate("/login");
@@ -21,11 +23,16 @@ const Profile = () => {
     if (email) {
       setUserEmail(email);
     }
+
+    if (userType) {
+      setUserRole(userType === "admin" ? "Administrateur" : "Élève");
+    }
   }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("userType");
     toast({
       title: "Déconnexion réussie",
       description: "À bientôt !",
@@ -43,6 +50,10 @@ const Profile = () => {
           <div>
             <h3 className="font-medium">Email</h3>
             <p className="text-gray-600">{userEmail}</p>
+          </div>
+          <div>
+            <h3 className="font-medium">Rôle</h3>
+            <p className="text-gray-600">{userRole}</p>
           </div>
           <div>
             <h3 className="font-medium">Mes emprunts en cours</h3>
