@@ -9,6 +9,7 @@ import Books from "./pages/Books";
 import Search from "./pages/Search";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import Students from "./pages/Students";
 import AdminRoute from "./components/AdminRoute";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,14 @@ const App = () => (
             <Route path="/books" element={<Books />} />
             <Route path="/search" element={<Search />} />
             <Route path="/profile" element={<Profile />} />
+            <Route
+              path="/students"
+              element={
+                <AdminRoute>
+                  <Students />
+                </AdminRoute>
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>

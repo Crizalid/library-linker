@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, LayoutDashboard, Search, UserCircle } from "lucide-react";
+import { BookOpen, LayoutDashboard, Search, UserCircle, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAdmin } from "@/hooks/useAdmin";
 
 const NavigationButtons = () => {
   const location = useLocation();
+  const { isAdmin } = useAdmin();
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
 
   const menuItems = [
@@ -12,6 +14,7 @@ const NavigationButtons = () => {
     { icon: BookOpen, label: "Books", path: "/books" },
     { icon: Search, label: "Search", path: "/search" },
     ...(isLoggedIn ? [{ icon: UserCircle, label: "Profile", path: "/profile" }] : []),
+    ...(isAdmin ? [{ icon: Users, label: "Gérer les élèves", path: "/students" }] : []),
   ];
 
   return (
