@@ -23,6 +23,22 @@ const Login = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Vérification des identifiants admin
+    if (userType === "admin" && email === "Mamba dz" && password === "Drebssi2024") {
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("userType", "admin");
+
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue sur votre espace administrateur",
+      });
+
+      navigate("/books");
+      return;
+    }
+
+    // Vérification pour les autres utilisateurs
     if (email && password) {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userEmail", email);
@@ -70,11 +86,11 @@ const Login = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Identifiant</Label>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="exemple@email.com"
+                  type="text"
+                  placeholder="Entrez votre identifiant"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />

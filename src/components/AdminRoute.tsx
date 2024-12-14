@@ -1,8 +1,8 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useToast } from "@/components/ui/use-toast";
 
-const AdminRoute = () => {
+const AdminRoute = ({ children }: { children: React.ReactElement }) => {
   const { isAdmin } = useAdmin();
   const { toast } = useToast();
 
@@ -15,7 +15,7 @@ const AdminRoute = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />;
+  return children;
 };
 
 export default AdminRoute;
