@@ -56,6 +56,40 @@ const Profile = () => {
     navigate("/login");
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Erreur",
+          description: "Utilisateur non trouvé",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Delete the user's auth account
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
+
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte a été supprimé avec succès",
+      });
+
+      // Logout and redirect
+      await handleLogout();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -88,9 +122,20 @@ const Profile = () => {
             <h3 className="font-medium">Mes emprunts en cours</h3>
             <p className="text-gray-600">Aucun emprunt en cours</p>
           </div>
-          <Button variant="destructive" onClick={handleLogout}>
-            Se déconnecter
-          </Button>
+          <div className="space-y-2">
+            <Button variant="destructive" onClick={handleLogout}>
+              Se déconnecter
+            </Button>
+            {userRole === 'admin' && (
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteAccount}
+                className="ml-2"
+              >
+                Supprimer le compte
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
