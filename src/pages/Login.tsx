@@ -27,7 +27,6 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Connexion avec Supabase
       const { data: { user }, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -36,7 +35,6 @@ const Login = () => {
       if (authError) throw authError;
 
       if (user) {
-        // Mise à jour du profil si nécessaire
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ user_type: userType })

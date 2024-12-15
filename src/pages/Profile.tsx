@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { Database } from "@/integrations/supabase/types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Profile = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -24,13 +27,13 @@ const Profile = () => {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('*')
+        .select()
         .eq('id', user.id)
         .single();
 
       if (profile) {
-        setUserEmail(profile.email);
-        setUserRole(profile.user_type);
+        setUserEmail(profile.email || '');
+        setUserRole(profile.user_type || '');
       }
       
       setIsLoading(false);
