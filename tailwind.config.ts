@@ -81,9 +81,9 @@ export default {
         },
       },
       borderRadius: {
-        lg: "22px",
-        md: "16px",
-        sm: "12px",
+        lg: "0px",
+        md: "0px",
+        sm: "0px",
       },
       boxShadow: {
         'oneui': '0 1px 3px rgba(0, 0, 0, 0.08)',
