@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -17,45 +18,51 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("student");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    // Vérification des identifiants admin
-    if (userType === "admin" && email === "Mamba dz" && password === "Drebssi2024") {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userType", "admin");
-
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre espace administrateur",
+    try {
+      // Connexion avec Supabase
+      const { data: { user }, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
       });
 
-      navigate("/books");
-      return;
-    }
+      if (authError) throw authError;
 
-    // Vérification pour les autres utilisateurs
-    if (email && password) {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userType", userType);
+      if (user) {
+        // Mise à jour du profil si nécessaire
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ user_type: userType })
+          .eq('id', user.id);
 
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre espace personnel",
-      });
+        if (profileError) throw profileError;
 
-      navigate("/books");
-    } else {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userType", userType);
+
+        toast({
+          title: "Connexion réussie",
+          description: `Bienvenue sur votre espace ${userType === 'admin' ? 'administrateur' : 'personnel'}`,
+        });
+
+        navigate("/books");
+      }
+    } catch (error: any) {
       toast({
         title: "Erreur de connexion",
-        description: "Veuillez remplir tous les champs",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,13 +93,14 @@ const Login = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Identifiant</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  type="text"
-                  placeholder="Entrez votre identifiant"
+                  type="email"
+                  placeholder="Entrez votre email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -102,10 +110,15 @@ const Login = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Se connecter
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  "Se connecter"
+                )}
               </Button>
             </form>
           </CardContent>

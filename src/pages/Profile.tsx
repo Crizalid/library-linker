@@ -3,48 +3,74 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 const Profile = () => {
   const [userEmail, setUserEmail] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-    const email = localStorage.getItem("userEmail");
-    const userType = localStorage.getItem("userType");
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate("/login");
+        return;
+      }
 
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-    if (email) {
-      setUserEmail(email);
-    }
+      if (profile) {
+        setUserEmail(profile.email);
+        setUserRole(profile.user_type);
+      }
+      
+      setIsLoading(false);
+    };
 
-    if (userType) {
-      setUserRole(userType === "admin" ? "Administrateur" : "Élève");
-    }
+    fetchProfile();
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userType");
+    
     toast({
       title: "Déconnexion réussie",
       description: "À bientôt !",
     });
+    
     navigate("/login");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
       <Card>
         <CardHeader>
-          <CardTitle>Mon Profil</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            Mon Profil
+            <Badge variant={userRole === 'admin' ? 'destructive' : 'secondary'}>
+              {userRole === 'admin' ? 'Administrateur' : 'Élève'}
+            </Badge>
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -53,7 +79,7 @@ const Profile = () => {
           </div>
           <div>
             <h3 className="font-medium">Rôle</h3>
-            <p className="text-gray-600">{userRole}</p>
+            <p className="text-gray-600">{userRole === 'admin' ? 'Administrateur' : 'Élève'}</p>
           </div>
           <div>
             <h3 className="font-medium">Mes emprunts en cours</h3>
