@@ -1,58 +1,57 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
-import { Database } from "@/integrations/supabase/types";
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Profile = () => {
-  const [userEmail, setUserEmail] = useState("");
-  const [userRole, setUserRole] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        navigate("/login");
-        return;
-      }
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          navigate("/login");
+          return;
+        }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', user.id)
-        .single();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
 
-      if (profile) {
-        setUserEmail(profile.email || '');
-        setUserRole(profile.user_type || '');
+        setUserRole(profile?.user_type || null);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
 
-    fetchProfile();
+    checkAuth();
   }, [navigate]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la déconnexion",
+        variant: "destructive",
+      });
+      return;
+    }
+
     localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userType");
-    
-    toast({
-      title: "Déconnexion réussie",
-      description: "À bientôt !",
-    });
-    
     navigate("/login");
   };
 
@@ -93,44 +92,41 @@ const Profile = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            Mon Profil
-            <Badge variant={userRole === 'admin' ? 'destructive' : 'secondary'}>
-              {userRole === 'admin' ? 'Administrateur' : 'Élève'}
-            </Badge>
-          </CardTitle>
+          <CardTitle>Mon Profil</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div>
-            <h3 className="font-medium">Email</h3>
-            <p className="text-gray-600">{userEmail}</p>
-          </div>
-          <div>
-            <h3 className="font-medium">Rôle</h3>
-            <p className="text-gray-600">{userRole === 'admin' ? 'Administrateur' : 'Élève'}</p>
+            <h3 className="font-medium">Type de compte</h3>
+            <p className="text-gray-600">
+              {userRole === 'admin' ? 'Administrateur' : 'Élève'}
+            </p>
           </div>
           <div>
             <h3 className="font-medium">Mes emprunts en cours</h3>
             <p className="text-gray-600">Aucun emprunt en cours</p>
           </div>
           <div className="space-y-2">
-            <Button variant="destructive" onClick={handleLogout}>
+            <Button 
+              variant="destructive" 
+              onClick={handleLogout}
+              className="rounded-none"
+            >
               Se déconnecter
             </Button>
             {userRole === 'admin' && (
               <Button 
                 variant="destructive" 
                 onClick={handleDeleteAccount}
-                className="ml-2"
+                className="ml-2 rounded-none"
               >
                 Supprimer le compte
               </Button>
